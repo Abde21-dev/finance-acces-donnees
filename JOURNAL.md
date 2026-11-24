@@ -7,3 +7,7 @@
 ## Erreur : VS Code ne trouve pas l'interpréteur `.venv`
 - **Cause** : j'avais ouvert un espace de travail avec plusieurs dossiers au lieu du dossier du projet.
 - **Solution** : File → Close Workspace, puis File → Open Folder sur `finance-acces-donnees`.
+
+## Erreur : « remote: Repository not found » au premier push
+- **Cause** : je n'avais pas encore créé le dépôt sur GitHub.
+- **Solution** : créer le dépôt sur GitHub (privé, sans README), puis relancer `git push -u origin main`.
