@@ -11,3 +11,13 @@
 ## Erreur : « remote: Repository not found » au premier push
 - **Cause** : je n'avais pas encore créé le dépôt sur GitHub.
 - **Solution** : créer le dépôt sur GitHub (privé, sans README), puis relancer `git push -u origin main`.
+
+## Erreur : «  err.raise_mysql_exception(self._data)» 
+- **Cause** : File "/home/kaliabde/finance-acces-donnees/.venv/lib/python3.14/site-packages/pymysql/protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/home/kaliabde/finance-acces-donnees/.venv/lib/python3.14/site-packages/pymysql/err.py", line 154, in raise_mysql_exception
+    raise errorclass(errno, errval, sqlstate=sqlstate)
+pymysql.err.IntegrityError: (1062, "Duplicate entry 'NRDB' for key 'symbole_boursier'")
+- **Cause** : Cette société a déjà été créer
+- **Solution** : C'est le comportement qui est attendu .
