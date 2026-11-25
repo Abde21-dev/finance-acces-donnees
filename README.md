@@ -45,3 +45,7 @@ Affiche les informations de la société, ses indicateurs de la dernière année
 - Compte dédié aux droits minimum, jamais le compte administrateur.
 - Aucun mot de passe dans le code ni dans l'historique Git.
 - Toute modification est validée (`commit`) ou annulée (`rollback`) en cas d'erreur.
+
+## Lancer l'API
+    uvicorn api:app --reload
+Documentation interactive : http://127.0.0.1:8000/docs

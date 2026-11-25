@@ -31,7 +31,7 @@ SHOW GRANTS affiche exactement ces droits :
 | Grants for app_finance@localhost                                                                                   |
 +--------------------------------------------------------------------------------------------------------------------+
 | GRANT USAGE ON *.* TO `app_finance`@`localhost` IDENTIFIED BY PASSWORD '*92EBCFFCD2888227B7B5728FD7E84CB41FE4ADF2' |
-| GRANT SELECT ON `finance`.`cours_bourse` TO `app_finance`@`localhost`                                              |
+| GRANT SELECT ON `finance`.`cours_bourse` TO `*******`@`localhost`                                              |
 | GRANT SELECT ON `finance`.`bilans` TO `app_finance`@`localhost`                                                    |
 | GRANT SELECT, INSERT ON `finance`.`societes` TO `app_finance`@`localhost`                                          |
 +--------------------------------------------------------------------------------------------------------------------+
