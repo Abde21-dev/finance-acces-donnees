@@ -96,3 +96,24 @@ lister_societes()
 - **Solution** : ajouter la colonne `devise` et un 5e `%s` dans `SQL_AJOUTER_SOCIETE`,
   puis relancer l'interpréteur Python pour recharger le fichier.
 - **À retenir** : il doit toujours y avoir autant de `%s` que de valeurs dans le tuple.exit()
+
+## Installation de la base (compte administrateur)
+
+    sudo mariadb < sql/001_creation.sql
+    sudo mariadb < sql/002_ajout_devise.sql
+    sudo mariadb < sql/jeu_de_test.sql
+
+Puis créer le compte applicatif `app_finance` (voir la section Sécurité)
+et renseigner ses identifiants dans `.env` (modèle : `.env.example`).
+
+# Test de cas limimite :
+└─$ python main.py 99
+Aucune société avec l'identifiant 99.
+
+# Test d'authentification :
+└─$ python main.py abc
+Identifiant invalide : « abc » (un nombre entier est attendu).
+
+# Test d'intrusion : 
+└─$ python main.py ' OR 1=1 --'                                 
+Identifiant invalide : «  OR 1=1 -- » (un nombre entier est attendu)
