@@ -64,3 +64,11 @@ ERROR 1142 (42000) at line 1: DELETE command denied to user 'app_finance'@'local
 [Societe(id=1, nom='Solaria Énergie', symbole_boursier='SOLR', secteur_activite='Énergie', pays='France')]
 >>> lister_societes("' OR '1'='1")
 []
+
+# Commandes 
+from datetime import date
+from acces_donnees import lister_societes, lister_bilans, lister_cours
+lister_societes()
+
+# Résultat
+[Societe(id=3, nom='Medivita Santé', symbole_boursier='MDVT', secteur_activite='Santé', pays='Suisse'), Societe(id=2, nom='Nordia Banque', symbole_boursier='NRDB', secteur_activite='Finance', pays='Belgique'), Societe(id=4, nom='Pixelwave Studios', symbole_boursier='PXLW', secteur_activite='Technologie', pays='Canada'), Societe(id=1, nom='Solaria Énergie', symbole_boursier='SOLR', secteur_activite='Énergie', pays='France')]
