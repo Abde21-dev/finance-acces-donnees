@@ -72,3 +72,27 @@ lister_societes()
 
 # Résultat
 [Societe(id=3, nom='Medivita Santé', symbole_boursier='MDVT', secteur_activite='Santé', pays='Suisse'), Societe(id=2, nom='Nordia Banque', symbole_boursier='NRDB', secteur_activite='Finance', pays='Belgique'), Societe(id=4, nom='Pixelwave Studios', symbole_boursier='PXLW', secteur_activite='Technologie', pays='Canada'), Societe(id=1, nom='Solaria Énergie', symbole_boursier='SOLR', secteur_activite='Énergie', pays='France')]
+
+## Évolution 002 : ajout de la devise
+- Commande : `sudo mariadb < sql/002_ajout_devise.sql`
+- Résultat : la colonne `devise` est ajoutée, et les 4 sociétés existantes
+  ont reçu `EUR` automatiquement grâce au `DEFAULT`.
+- Données conservées : 4 sociétés, 12 bilans et 40 cours avant et après l'évolution.
+
+```
++----+-------------------+--------+
+| id | nom               | devise |
++----+-------------------+--------+
+|  1 | Solaria Énergie   | EUR    |
+|  2 | Nordia Banque     | EUR    |
+|  3 | Medivita Santé    | EUR    |
+|  4 | Pixelwave Studios | EUR    |
++----+-------------------+--------+
+```
+
+## Erreur : ProgrammingError: not all arguments converted during string formatting
+- **Cause** : après l'ajout de la devise, la fonction envoyait 5 paramètres,
+  mais la requête INSERT n'avait que 4 `%s`.
+- **Solution** : ajouter la colonne `devise` et un 5e `%s` dans `SQL_AJOUTER_SOCIETE`,
+  puis relancer l'interpréteur Python pour recharger le fichier.
+- **À retenir** : il doit toujours y avoir autant de `%s` que de valeurs dans le tuple.exit()

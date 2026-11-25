@@ -6,11 +6,12 @@ from typing import Optional
 
 @dataclass
 class Societe:
-    id: Optional[int]          # None tant que la société n'est pas encore en base
+    id: Optional[int]          
     nom: str
     symbole_boursier: str
     secteur_activite: str
     pays: str
+    devise: str = "EUR"
 
 
 @dataclass

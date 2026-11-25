@@ -4,27 +4,27 @@ from modeles import Societe, Bilan, Cours
 # ---------- Requêtes SQL (toutes regroupées ici) ----------
 
 SQL_LISTER_SOCIETES = """
-    SELECT id, nom, symbole_boursier, secteur_activite, pays
+    SELECT id, nom, symbole_boursier, secteur_activite, pays, devise
     FROM societes
     ORDER BY nom
 """
 
 SQL_LISTER_SOCIETES_PAR_SECTEUR = """
-    SELECT id, nom, symbole_boursier, secteur_activite, pays
+    SELECT id, nom, symbole_boursier, secteur_activite, pays, devise
     FROM societes
     WHERE secteur_activite = %s
     ORDER BY nom
 """
 
 SQL_LIRE_SOCIETE = """
-    SELECT id, nom, symbole_boursier, secteur_activite, pays
+    SELECT id, nom, symbole_boursier, secteur_activite, pays, devise
     FROM societes
     WHERE id = %s
 """
 
 SQL_AJOUTER_SOCIETE = """
-    INSERT INTO societes (nom, symbole_boursier, secteur_activite, pays)
-    VALUES (%s, %s, %s, %s)
+    INSERT INTO societes (nom, symbole_boursier, secteur_activite, pays, devise)
+    VALUES (%s, %s, %s, %s, %s)
 """
 
 SQL_LISTER_BILANS = """
@@ -81,7 +81,7 @@ def ajouter_societe(societe):
             curseur.execute(
                 SQL_AJOUTER_SOCIETE,
                 (societe.nom, societe.symbole_boursier,
-                 societe.secteur_activite, societe.pays),
+                 societe.secteur_activite, societe.pays, societe.devise),
             )
             nouvel_id = curseur.lastrowid
         connexion.commit()
@@ -91,6 +91,7 @@ def ajouter_societe(societe):
             symbole_boursier=societe.symbole_boursier,
             secteur_activite=societe.secteur_activite,
             pays=societe.pays,
+            devise=societe.devise,
         )
     except Exception:
         connexion.rollback()
