@@ -65,6 +65,18 @@ ERROR 1142 (42000) at line 1: DELETE command denied to user 'app_finance'@'local
 >>> lister_societes("' OR '1'='1")
 []
 
+# Test de cas limimite :
+└─$ python main.py 99
+Aucune société avec l'identifiant 99.
+
+# Test d'authentification :
+└─$ python main.py abc
+Identifiant invalide : « abc » (un nombre entier est attendu).
+
+# Test d'intrusion : 
+└─$ python main.py ' OR 1=1 --'                                 
+Identifiant invalide : «  OR 1=1 -- » (un nombre entier est attendu)
+
 # Commandes 
 from datetime import date
 from acces_donnees import lister_societes, lister_bilans, lister_cours
@@ -106,14 +118,3 @@ lister_societes()
 Puis créer le compte applicatif `app_finance` (voir la section Sécurité)
 et renseigner ses identifiants dans `.env` (modèle : `.env.example`).
 
-# Test de cas limimite :
-└─$ python main.py 99
-Aucune société avec l'identifiant 99.
-
-# Test d'authentification :
-└─$ python main.py abc
-Identifiant invalide : « abc » (un nombre entier est attendu).
-
-# Test d'intrusion : 
-└─$ python main.py ' OR 1=1 --'                                 
-Identifiant invalide : «  OR 1=1 -- » (un nombre entier est attendu)
