@@ -1,5 +1,6 @@
 import sys
 from datetime import date
+from connexion import ouvrir_connexion
 
 from acces_donnees import lire_societe, lister_bilans, lister_cours
 from indicateurs import (
@@ -109,18 +110,17 @@ def main():
     else:
         societe_id = SOCIETE_PAR_DEFAUT
 
-    societe = lire_societe(societe_id)
-    if societe is None:
-        print(f"Aucune société avec l'identifiant {societe_id}.")
-        return
-
-    bilans = lister_bilans(societe.id)
-    cours = lister_cours(societe.id, DATE_DEBUT_COURS, date.today())
+    connexion = ouvrir_connexion()
+    try:
+        societe = lire_societe(connexion, societe_id)
+        if societe is None:
+            print(f"Aucune société avec l'identifiant {societe_id}.")
+            return
+        bilans = lister_bilans(connexion, societe.id)
+        cours = lister_cours(connexion, societe.id, DATE_DEBUT_COURS, date.today())
+    finally:
+        connexion.close()
 
     afficher_societe(societe)
     afficher_indicateurs(societe, bilans, cours)
     afficher_moyenne_mobile(societe, cours)
-
-
-if __name__ == "__main__":
-    main()
