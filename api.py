@@ -48,17 +48,18 @@ def get_societes(secteur: Optional[str] = None):
 
 
 @app.get(
-    "/societes/{societe_id}",
-    response_model=Societe,
+    "/societes",
+    response_model=list[Societe],
     status_code=status.HTTP_200_OK,
-    summary="Lire une société"
+    summary="Lister les sociétés",
 )
-def get_societe(societe_id: int):
-    """Renvoie les détails d'une société à partir de son identifiant."""
-    societe = lire_societe(societe_id)
-    if not societe:
-        raise HTTPException(status_code=404, detail="Société introuvable.")
-    return societe
+def get_societes(secteur: Optional[str] = None):
+  """Renvoie la liste de toutes les sociétés, avec un filtre facultatif par secteur."""
+  try:
+    return lister_societes(secteur=secteur)
+  except Exception as e:
+    # On affiche l'erreur exacte pour le debug
+    raise HTTPException(status_code=500, detail=f"Erreur technique : {str(e)}")
 
 
 @app.post(
