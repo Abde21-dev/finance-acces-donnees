@@ -2,14 +2,16 @@ import logging
 from datetime import date
 from typing import Annotated
 
-from fastapi import Depends, FastAPI, HTTPException, Path, Query, Request
+from fastapi import Depends, FastAPI, HTTPException, Path, Query, Request, Response, status
 from fastapi.responses import JSONResponse
 from pymysql.connections import Connection
+from modeles import Societe
 
 import acces_donnees
 from connexion import ouvrir_connexion
 from erreurs import ErreurMetier, SocieteIntrouvable, SocieteLiee, SymboleDejaUtilise
-from schemas import BilanSortie, CoursSortie, Erreur, SocieteSortie
+from schemas import BilanSortie, CoursSortie, Erreur, SocieteEntree, SocieteSortie
+
 
 journal = logging.getLogger("api")
 
@@ -82,6 +84,21 @@ def lister_societes(connexion: ConnexionBD, secteur: Annotated[str | None, Query
 def lire_societe(connexion: ConnexionBD, societe_id: IdSociete):
     return acces_donnees.lire_societe_existante(connexion, societe_id)
 
+@app.post(
+    "/societes",
+    response_model=SocieteSortie,
+    status_code=status.HTTP_201_CREATED,
+    summary="Créer une société",
+    description="Crée une société. Le symbole boursier doit être unique. La devise vaut EUR par défaut.",
+    responses={
+        409: {"model": Erreur, "description": "Symbole boursier déjà utilisé"},
+        422: {"description": "Données invalides"},
+    },
+)
+def creer_societe(connexion: ConnexionBD, donnees: SocieteEntree, response: Response):
+    societe = acces_donnees.ajouter_societe(connexion, Societe(id=None, **donnees.model_dump()))
+    response.headers["Location"] = f"/societes/{societe.id}"
+    return societe
 
 @app.get(
     "/societes/{societe_id}/bilans",
