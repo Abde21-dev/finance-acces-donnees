@@ -23,7 +23,7 @@ Elle lit et ajoute des données de façon sécurisée et calcule cinq indicateur
     sudo mariadb < sql/jeu_de_test.sql
 
 Créer ensuite, dans `sudo mariadb`, le compte `app_finance` avec seulement :
-`SELECT, INSERT` sur `societes` et `SELECT` sur `bilans` et `cours_bourse`.
+`SELECT, INSERT, UPDATE, DELETE` sur `societes` et `SELECT` sur `bilans` et `cours_bourse`.
 
 ## Configuration
 Copier `.env.example` en `.env`, puis renseigner les identifiants de `app_finance`.

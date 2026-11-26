@@ -99,6 +99,36 @@ def creer_societe(connexion: ConnexionBD, donnees: SocieteEntree, response: Resp
     societe = acces_donnees.ajouter_societe(connexion, Societe(id=None, **donnees.model_dump()))
     response.headers["Location"] = f"/societes/{societe.id}"
     return societe
+@app.put(
+    "/societes/{societe_id}",
+    response_model=SocieteSortie,
+    summary="Remplacer une société",
+    description="Remplace toutes les informations de la société. Un champ absent reprend sa valeur par défaut (devise : EUR).",
+    responses={
+        404: {"model": Erreur, "description": "Société introuvable"},
+        409: {"model": Erreur, "description": "Symbole boursier déjà utilisé par une autre société"},
+        422: {"description": "Données invalides"},
+    },
+)
+def remplacer_societe(connexion: ConnexionBD, societe_id: IdSociete, donnees: SocieteEntree):
+    return acces_donnees.remplacer_societe(
+        connexion, societe_id, Societe(id=None, **donnees.model_dump())
+    )
+
+
+@app.delete(
+    "/societes/{societe_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Supprimer une société",
+    description="Supprime la société. Refusé tant qu'elle a des bilans ou des cours enregistrés.",
+    responses={
+        404: {"model": Erreur, "description": "Société introuvable"},
+        409: {"model": Erreur, "description": "Société encore liée à des bilans ou des cours"},
+    },
+)
+def supprimer_societe(connexion: ConnexionBD, societe_id: IdSociete):
+    acces_donnees.supprimer_societe(connexion, societe_id)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 @app.get(
     "/societes/{societe_id}/bilans",

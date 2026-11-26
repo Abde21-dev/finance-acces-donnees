@@ -2,11 +2,13 @@ from datetime import date
 
 import pymysql
 
-from erreurs import SocieteIntrouvable, SymboleDejaUtilise
+from erreurs import SocieteIntrouvable, SocieteLiee, SymboleDejaUtilise
 from modeles import Bilan, Cours, Societe
+
 
 # Codes d'erreur MariaDB utilisés
 ERREUR_DOUBLON = 1062
+ERREUR_LIGNE_REFERENCEE = 1451   # suppression bloquée par une clé étrangère
 
 # Bornes des dates acceptées par MariaDB, utilisées quand aucune période n'est donnée
 DATE_MIN = date(1000, 1, 1)
@@ -36,6 +38,17 @@ SQL_LIRE_SOCIETE = """
 SQL_AJOUTER_SOCIETE = """
     INSERT INTO societes (nom, symbole_boursier, secteur_activite, pays, devise)
     VALUES (%s, %s, %s, %s, %s)
+"""
+
+SQL_REMPLACER_SOCIETE = """
+    UPDATE societes
+    SET nom = %s, symbole_boursier = %s, secteur_activite = %s, pays = %s, devise = %s
+    WHERE id = %s
+"""
+
+SQL_SUPPRIMER_SOCIETE = """
+    DELETE FROM societes
+    WHERE id = %s
 """
 
 SQL_LISTER_BILANS = """
@@ -112,7 +125,52 @@ def ajouter_societe(connexion, societe):
         pays=societe.pays,
         devise=societe.devise,
     )
+def remplacer_societe(connexion, societe_id, societe):
+    """Remplace toutes les informations d'une société existante et la renvoie.
+    Lève SocieteIntrouvable ou SymboleDejaUtilise. Valide ou annule la modification."""
+    lire_societe_existante(connexion, societe_id)
+    try:
+        with connexion.cursor() as curseur:
+            curseur.execute(
+                SQL_REMPLACER_SOCIETE,
+                (societe.nom, societe.symbole_boursier, societe.secteur_activite,
+                 societe.pays, societe.devise, societe_id),
+            )
+        connexion.commit()
+    except pymysql.err.IntegrityError as erreur:
+        connexion.rollback()
+        if erreur.args[0] == ERREUR_DOUBLON:
+            raise SymboleDejaUtilise(societe.symbole_boursier) from None
+        raise
+    except Exception:
+        connexion.rollback()
+        raise
+    return Societe(
+        id=societe_id,
+        nom=societe.nom,
+        symbole_boursier=societe.symbole_boursier,
+        secteur_activite=societe.secteur_activite,
+        pays=societe.pays,
+        devise=societe.devise,
+    )
 
+
+def supprimer_societe(connexion, societe_id):
+    """Supprime une société.
+    Lève SocieteIntrouvable, ou SocieteLiee si elle a encore des bilans ou des cours."""
+    lire_societe_existante(connexion, societe_id)
+    try:
+        with connexion.cursor() as curseur:
+            curseur.execute(SQL_SUPPRIMER_SOCIETE, (societe_id,))
+        connexion.commit()
+    except pymysql.err.IntegrityError as erreur:
+        connexion.rollback()
+        if erreur.args[0] == ERREUR_LIGNE_REFERENCEE:
+            raise SocieteLiee(societe_id) from None
+        raise
+    except Exception:
+        connexion.rollback()
+        raise
 
 # ---------- Bilans et cours ----------
 
