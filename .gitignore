@@ -3,6 +3,7 @@
 
 # Secrets : ne jamais versionner
 .env
+JOURNAL.md
 
 # Fichiers générés par Python
 __pycache__/
