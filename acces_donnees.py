@@ -44,6 +44,16 @@ SQL_LISTER_COURS_PERIODE = """
     ORDER BY date_cours
 """
 
+SQL_MODIFIER_SOCIETE = """
+    UPDATE societes
+    SET nom = %s, symbole_boursier = %s, secteur_activite = %s, pays = %s, devise = %s
+    WHERE id = %s
+"""
+
+SQL_SUPPRIMER_SOCIETE = """
+    DELETE FROM societes WHERE id = %s
+"""
+
 # ---------- Fonctions d'accès ----------
 
 def lister_societes(secteur=None):
@@ -71,6 +81,7 @@ def lire_societe(societe_id):
         return Societe(**ligne) if ligne else None
     finally:
         connexion.close()
+
 
 def ajouter_societe(societe):
     """Enregistre une nouvelle société et la renvoie avec son identifiant.
@@ -121,4 +132,46 @@ def lister_cours(societe_id, date_debut, date_fin):
             lignes = curseur.fetchall()
         return [Cours(**ligne) for ligne in lignes]
     finally:
-        connexion.close()        
+        connexion.close()
+
+
+def modifier_societe(societe_id, societe):
+    """Remplace les informations d'une société existante."""
+    connexion = ouvrir_connexion()
+    try:
+        with connexion.cursor() as curseur:
+            curseur.execute(
+                SQL_MODIFIER_SOCIETE,
+                (
+                    societe.nom,
+                    societe.symbole_boursier,
+                    societe.secteur_activite,
+                    societe.pays,
+                    societe.devise,
+                    societe_id,
+                ),
+            )
+            nb_lignes = curseur.rowcount
+        connexion.commit()
+        return nb_lignes > 0
+    except Exception:
+        connexion.rollback()
+        raise
+    finally:
+        connexion.close()
+
+
+def supprimer_societe(societe_id):
+    """Supprime une société par son identifiant."""
+    connexion = ouvrir_connexion()
+    try:
+        with connexion.cursor() as curseur:
+            curseur.execute(SQL_SUPPRIMER_SOCIETE, (societe_id,))
+            nb_lignes = curseur.rowcount
+        connexion.commit()
+        return nb_lignes > 0
+    except Exception:
+        connexion.rollback()
+        raise
+    finally:
+        connexion.close()

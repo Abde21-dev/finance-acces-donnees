@@ -118,3 +118,22 @@ lister_societes()
 Puis créer le compte applicatif `app_finance` (voir la section Sécurité)
 et renseigner ses identifiants dans `.env` (modèle : `.env.example`).
 
+_______
+
+# Journal des erreurs - Projet API REST FastAPI
+
+### 1. Erreur d'environnement virtuel (PEP 668)
+* **Problème :** `error: externally-managed-environment` lors de l'installation de FastAPI et Uvicorn avec `pip install`.
+* **Cause :** Sécurité de Kali Linux interdisant l'installation de paquets Python globaux.
+* **Solution :** Activation de l'environnement virtuel avec `source .venv/bin/activate` avant d'exécuter `pip install`.
+
+### 2. Erreur d'importation des fonctions de modification
+* **Problème :** `ImportError: cannot import name 'modifier_societe' from 'acces_donnees'`.
+* **Cause :** Mauvaise indentation des fonctions `modifier_societe` et `supprimer_societe` dans le fichier `acces_donnees.py` (elles étaient imbriquées à l'intérieur de la fonction précédente).
+* **Solution :** Remise au niveau de la racine du fichier des deux fonctions.
+
+### 3. Gestion des conflits de base de données (Code 409)
+* **Problème :** L'API renvoyait une erreur 500 brute en cas de doublon de symbole boursier ou de suppression d'une société liée à des bilans.
+* **Cause :** Les exceptions `pymysql.err.IntegrityError` n'étaient pas interceptées et traduites en codes HTTP.
+* **Solution :** Utilisation de blocs `try/except pymysql.err.IntegrityError` dans l'API pour renvoyer proprement un code `409 Conflict` avec un message clair.
+
