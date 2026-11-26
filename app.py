@@ -1,6 +1,7 @@
 from datetime import date
 import pandas as pd
 import streamlit as st
+import re
 
 from acces_donnees import (
     ajouter_societe,
@@ -39,6 +40,22 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+# ---------- Fonctions de validation des entrées ----------
+def valider_champ_texte(valeur: str) -> bool:
+    """Vérifie qu'un champ texte ne contient pas de balises HTML ou de caractères suspects."""
+    if not valeur:
+        return False
+    # Interdit formellement les chevrons (< et >) souvent utilisés pour les injections
+    if "<" in valeur or ">" in valeur:
+        return False
+    # Autorise lettres, chiffres, espaces et quelques ponctuations courantes
+    pattern = r"^[\w\sàâäéèêëîïôöùûüçœæ\-\'\.\&\(\)]+$"
+    return bool(re.match(pattern, valeur, re.UNICODE))
+
+def valider_symbole_devise(valeur: str) -> bool:
+    """Vérifie que le symbole boursier ou la devise est au bon format (lettres majuscules/chiffres)."""
+    pattern = r"^[A-Z0-9]{1,10}$"
+    return bool(valeur and re.match(pattern, valeur))
 
 # ---------- Fonctions de formatage ----------
 def montant(valeur, devise):
@@ -115,10 +132,11 @@ if mode == "📋 Vue d'ensemble de toutes les sociétés":
     submitted = st.form_submit_button("Enregistrer la société")
     if submitted:
       if not n_nom or not n_symbole or not n_secteur or not n_pays or not n_devise:
-        st.error(
-            "⚠️ Tous les champs du formulaire doivent être remplis et"
-            " nettoyés."
-        )
+        st.error("⚠️ Tous les champs du formulaire doivent être remplis.")
+      elif not valider_champ_texte(n_nom) or not valider_champ_texte(n_secteur) or not valider_champ_texte(n_pays):
+        st.error("⚠️ Caractères non autorisés détectés (balises HTML ou symboles < et > interdits).")
+      elif not valider_symbole_devise(n_symbole) or not valider_symbole_devise(n_devise):
+        st.error("⚠️ Le symbole et la devise doivent contenir uniquement des lettres majuscules et des chiffres (max 10).")
       else:
         try:
           nouvelle_soc = Societe(
@@ -176,6 +194,10 @@ else:
       if submitted:
         if not n_nom or not n_symbole or not n_secteur or not n_pays or not n_devise:
           st.error("⚠️ Tous les champs sont obligatoires.")
+        elif not valider_champ_texte(n_nom) or not valider_champ_texte(n_secteur) or not valider_champ_texte(n_pays):
+          st.error("⚠️ Caractères non autorisés détectés.")
+        elif not valider_symbole_devise(n_symbole) or not valider_symbole_devise(n_devise):
+          st.error("⚠️ Format de symbole ou devise invalide.")
         else:
           try:
             nouvelle_soc = Societe(
@@ -216,6 +238,10 @@ else:
         if btn_modif:
           if not m_nom or not m_symbole or not m_secteur or not m_pays or not m_devise:
             st.error("Tous les champs doivent être remplis.")
+          elif not valider_champ_texte(m_nom) or not valider_champ_texte(m_secteur) or not valider_champ_texte(m_pays):
+            st.error("⚠️ Caractères non autorisés détectés.")
+          elif not valider_symbole_devise(m_symbole) or not valider_symbole_devise(m_devise):
+            st.error("⚠️ Format de symbole ou devise invalide.")
           else:
             try:
               societe_maj = Societe(
